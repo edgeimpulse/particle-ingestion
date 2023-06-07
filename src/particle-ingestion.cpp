@@ -21,10 +21,6 @@
  * `edge-impulse-data-forwarder` and start capturing data
  */
 #define SAMPLE_ACCELEROMETER
-// #define SAMPLE_GYROSCOPE
-// #define SAMPLE_ORIENTATION
-// #define SAMPLE_ENVIRONMENTAL
-// #define SAMPLE_ROTATION_VECTOR
 
 /**
  * Configure the sample frequency. This is the frequency used to send the data
@@ -52,25 +48,8 @@ SYSTEM_THREAD(ENABLED);
 void ei_printf(const char *format, ...);
 
 /* Private variables ------------------------------------------------------- */
-static unsigned long last_interval_ms = 0;
-
 #ifdef SAMPLE_ACCELEROMETER
 ADXL362DMA accel(SPI, A2);
-#endif
-#ifdef SAMPLE_GYROSCOPE
-SensorXYZ gyro(SENSOR_ID_GYRO);
-#endif
-#ifdef SAMPLE_ORIENTATION
-SensorOrientation ori(SENSOR_ID_ORI);
-#endif
-#ifdef SAMPLE_ENVIRONMENTAL
-Sensor temp(SENSOR_ID_TEMP);
-Sensor baro(SENSOR_ID_BARO);
-Sensor hum(SENSOR_ID_HUM);
-Sensor gas(SENSOR_ID_GAS);
-#endif
-#ifdef SAMPLE_ROTATION_VECTOR
-SensorQuaternion rotation(SENSOR_ID_RV);
 #endif
 
 void setup() 
@@ -92,21 +71,6 @@ void setup()
     accel.writeFilterControl(accel.RANGE_2G, false, false, accel.ODR_200);
 	accel.setMeasureMode(true);
 #endif
-#ifdef SAMPLE_GYROSCOPE
-    gyro.begin();
-#endif
-#ifdef ORIENTATION
-    ori.begin();
-#endif
-#ifdef SAMPLE_ENVIRONMENTAL
-    temp.begin();
-    baro.begin();
-    hum.begin();
-    gas.begin();
-#endif
-#ifdef SAMPLE_ROTATION_VECTOR
-    rotation.begin();
-#endif
 
 }
 
@@ -123,36 +87,7 @@ void loop() {
         ,(((float)(acc[2] * 2)) / 2048.f) * CONVERT_G_TO_MS2
     );
 #endif
-#ifdef SAMPLE_GYROSCOPE
-    ei_printf("%f, %f, %f,"
-        ,(gyro.x() * 8.0 / 32768.0) * CONVERT_G_TO_MS2
-        ,(gyro.y() * 8.0 / 32768.0) * CONVERT_G_TO_MS2
-        ,(gyro.z() * 8.0 / 32768.0) * CONVERT_G_TO_MS2
-    );
-#endif
-#ifdef SAMPLE_ORIENTATION
-    ei_printf("%f, %f, %f,"
-        ,ori.heading()
-        ,ori.pitch()
-        ,ori.roll()
-    );
-#endif
-#ifdef SAMPLE_ENVIRONMENTAL
-    ei_printf("%.2f, %.2f, %.2f, %.2f,"
-        ,temp.value()
-        ,baro.value()
-        ,hum.value()
-        ,gas.value()
-    );
-#endif
-#ifdef SAMPLE_ROTATION_VECTOR
-    ei_printf("%f, %f, %f, %f,"
-        ,rotation.x()
-        ,rotation.y()
-        ,rotation.z()
-        ,rotation.w()
-    );
-#endif
+
     ei_printf("\r\n");
 }
 
