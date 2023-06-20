@@ -36,6 +36,7 @@
 
 
 SYSTEM_THREAD(ENABLED);
+SerialLogHandler logHandler(LOG_LEVEL_ERROR);
 
 /* Constants --------------------------------------------------------------- */
 #if (FREQUENCY_HZ <= 0)
@@ -52,24 +53,21 @@ void ei_printf(const char *format, ...);
 ADXL362DMA accel(SPI, A2);
 #endif
 
-void setup() 
+void setup()
 {
     delay(2000);
-
-    /* Init serial */
-    Serial.begin(115200);
-    Serial.println("Edge Impulse sensor data ingestion\r\n");
+    ei_printf("Edge Impulse sensor data ingestion\r\n");
 
     /* Init & start sensors */
 #ifdef SAMPLE_ACCELEROMETER
-	accel.softReset();
-	while(accel.readStatus() == 0) {
-		Log.info("no status yet, waiting for accelerometer");
-		delay(1000);
-	}
+    accel.softReset();
+    while(accel.readStatus() == 0) {
+        ei_printf("no status yet, waiting for accelerometer\r\n");
+        delay(1000);
+    }
 
     accel.writeFilterControl(accel.RANGE_2G, false, false, accel.ODR_200);
-	accel.setMeasureMode(true);
+    accel.setMeasureMode(true);
 #endif
 
 }

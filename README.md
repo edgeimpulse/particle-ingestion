@@ -1,5 +1,7 @@
-# Particle Photon2 Ingestion Project
+# Edge Impulse's Particle Photon2 Ingestion Project
 
+For more information see our [Particle Photon 2](https://docs.edgeimpulse.com/docs/development-platforms/officially-supported-mcu-targets/particle-photon-2)
+documentation.
 
 ## Hardware
 The ingestion firmware is based on the Particle Photon2 and uses the [Analog Devices ADXL362](https://www.analog.com/media/en/technical-documentation/data-sheets/adxl362.pdf)
@@ -9,33 +11,21 @@ The library used, and included in this project can be found [here](https://githu
 ## Setup
 
 ### Particle Tools
-Make sure you've installed the particle tools. You can either use [particle cli](https://docs.particle.io/getting-started/developer-tools/cli/) or the VSCode extension [Workbench IDE](https://docs.particle.io/getting-started/developer-tools/workbench/)
+Make sure you've installed the particle tools. You can either use [particle cli](https://docs.particle.io/getting-started/developer-tools/cli/) or the VSCode extension [Workbench IDE](https://docs.particle.io/getting-started/developer-tools/workbench/) (recommended).
 
 ### Edge Impulse CLI
 For uploading data to studio, the `edge-impulse-data-forwarder` tool is used. This is included in the Edge Impulse CLI tools which can be downloaded [here](https://www.npmjs.com/package/edge-impulse-cli)
 
-## Build & Flash
 
-Building and flashing firmware can be done with either Particle cli or Workbench IDE. Building firmware locally can also be done using the `particle-build.sh` script. In order to use this, make sure Workbench IDE together with DeviceOS 5.3.2.
+## Build and Flash (locally): in Particle Workbench
 
-### Build
-To build firmware locally use:
-```
-$ ./particle-build.sh --build
-```
+1. In Workbench, select **Particle: Import Project** and select the `project.properties` file in the directory that you just downloaded and extracted.
 
-### Flash
-To flash firmware to the Particle device use:
-```
-$ ./particle-build.sh --flash
-```
+1. Use **Particle: Configure Project for Device** and select **deviceOS@5.4.0 (or a later version)** and choose a target. (e.g. **P2** , this option is also used for the Photon 2).
 
-### Clean
-Remove all build artifacts with:
-```
-$ ./particle-build.sh --clean
-```
+1. Compile with  **Particle: Compile application (local)**
 
+1. Flash with **Particle: Flash application (local)**
 
 ## Run
 
