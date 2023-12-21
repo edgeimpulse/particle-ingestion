@@ -20,7 +20,7 @@
  * values outputted over the serial line. Now connect to the studio using the
  * `edge-impulse-data-forwarder` and start capturing data
  */
-#define SAMPLE_ACCELEROMETER
+// #define SAMPLE_ACCELEROMETER
 
 /**
  * Configure the sample frequency. This is the frequency used to send the data
@@ -33,7 +33,7 @@
 /* Include ----------------------------------------------------------------- */
 #include "Particle.h"
 #include "ADXL362DMA.h"
-
+#include "adxl345.h"
 
 SYSTEM_THREAD(ENABLED);
 SerialLogHandler logHandler(LOG_LEVEL_ERROR);
@@ -51,6 +51,8 @@ void ei_printf(const char *format, ...);
 /* Private variables ------------------------------------------------------- */
 #ifdef SAMPLE_ACCELEROMETER
 ADXL362DMA accel(SPI, A2);
+#else
+ADXL345 accel;
 #endif
 
 void setup()
@@ -68,6 +70,9 @@ void setup()
 
     accel.writeFilterControl(accel.RANGE_2G, false, false, accel.ODR_200);
     accel.setMeasureMode(true);
+#else
+    accel.powerOn();
+    accel.setRangeSetting(2);
 #endif
 
 }
@@ -83,6 +88,14 @@ void loop() {
         ,(((float)(acc[0] * 2)) / 2048.f) * CONVERT_G_TO_MS2
         ,(((float)(acc[1] * 2)) / 2048.f) * CONVERT_G_TO_MS2
         ,(((float)(acc[2] * 2)) / 2048.f) * CONVERT_G_TO_MS2
+    );
+#else
+    signed short xyz[3];
+    accel.readAccel(xyz);
+    ei_printf("%f, %f, %f,"
+        ,(((float)xyz[0]) * 0.00389f) * CONVERT_G_TO_MS2
+        ,(((float)xyz[1]) * 0.00389f) * CONVERT_G_TO_MS2
+        ,(((float)xyz[2]) * 0.00389f) * CONVERT_G_TO_MS2
     );
 #endif
 
