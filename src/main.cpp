@@ -1,5 +1,5 @@
 /* Edge Impulse ingestion SDK
- * Copyright (c) 2023 EdgeImpulse Inc.
+ * Copyright (c) 2024 EdgeImpulse Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
  * values outputted over the serial line. Now connect to the studio using the
  * `edge-impulse-data-forwarder` and start capturing data
  */
-#define SAMPLE_ACCELEROMETER
+/* Supported accelerometers */
+#define ACC_ADXL362DMA  1
+#define ACC_ADXL345     2
 
 /**
  * Configure the sample frequency. This is the frequency used to send the data
@@ -32,8 +34,20 @@
 
 /* Include ----------------------------------------------------------------- */
 #include "Particle.h"
-#include "ADXL362DMA.h"
 
+#if PLATFORM_ID == PLATFORM_P2
+#define ACC_SENSOR  ACC_ADXL362DMA
+#elif defined(PARTICLE_BORON) || PLATFORM_ID == PLATFORM_BORON || PLATFORM_ID == PLATFORM_BSOM || PLATFORM_ID == PLATFORM_B5SOM
+#define ACC_SENSOR  ACC_ADXL345
+#else
+#error "No ACC sensor defined for this platform"
+#endif
+
+#if ACC_SENSOR == ACC_ADXL345
+#include "adxl345.h"
+#else
+#include "ADXL362DMA.h"
+#endif
 
 SYSTEM_THREAD(ENABLED);
 SerialLogHandler logHandler(LOG_LEVEL_ERROR);
@@ -49,8 +63,10 @@ SerialLogHandler logHandler(LOG_LEVEL_ERROR);
 void ei_printf(const char *format, ...);
 
 /* Private variables ------------------------------------------------------- */
-#ifdef SAMPLE_ACCELEROMETER
-ADXL362DMA accel(SPI, A2);
+#if ACC_SENSOR == ACC_ADXL345
+ADXL345 *accel;
+#else
+ADXL362DMA *accel;
 #endif
 
 void setup()
@@ -59,15 +75,25 @@ void setup()
     ei_printf("Edge Impulse sensor data ingestion\r\n");
 
     /* Init & start sensors */
-#ifdef SAMPLE_ACCELEROMETER
-    accel.softReset();
-    while(accel.readStatus() == 0) {
+#if ACC_SENSOR == ACC_ADXL345
+    accel = new ADXL345;
+#else
+    accel = new ADXL362DMA(SPI, D13 /* A2 */);
+#endif
+
+
+#if ACC_SENSOR == ACC_ADXL345
+    accel->powerOn();
+    accel->setRangeSetting(2);
+#else
+    accel->softReset();
+    delay(100);
+    while(accel->readStatus() == 0) {
         ei_printf("no status yet, waiting for accelerometer\r\n");
-        delay(1000);
     }
 
-    accel.writeFilterControl(accel.RANGE_2G, false, false, accel.ODR_200);
-    accel.setMeasureMode(true);
+    accel->writeFilterControl(accel->RANGE_2G, false, false, accel->ODR_200);
+    accel->setMeasureMode(true);
 #endif
 
 }
@@ -76,14 +102,22 @@ void loop() {
 
     delay(INTERVAL_MS);
 
-#ifdef SAMPLE_ACCELEROMETER
-    int16_t acc[3];
-    accel.readXYZ(acc[0], acc[1], acc[2]);
-    ei_printf("%f, %f, %f,"
-        ,(((float)(acc[0] * 2)) / 2048.f) * CONVERT_G_TO_MS2
-        ,(((float)(acc[1] * 2)) / 2048.f) * CONVERT_G_TO_MS2
-        ,(((float)(acc[2] * 2)) / 2048.f) * CONVERT_G_TO_MS2
-    );
+#if ACC_SENSOR == ACC_ADXL345
+        int16_t xyz[3];
+        accel->readAccel(xyz);
+        ei_printf("%f, %f, %f,"
+            ,(((float)xyz[0]) * 0.00389f) * CONVERT_G_TO_MS2
+            ,(((float)xyz[1]) * 0.00389f) * CONVERT_G_TO_MS2
+            ,(((float)xyz[2]) * 0.00389f) * CONVERT_G_TO_MS2
+        );
+#else
+        int16_t acc[3];
+        accel->readXYZ(acc[0], acc[1], acc[2]);
+        ei_printf("%f, %f, %f,"
+            ,(((float)(acc[0] * 2)) / 2048.f) * CONVERT_G_TO_MS2
+            ,(((float)(acc[1] * 2)) / 2048.f) * CONVERT_G_TO_MS2
+            ,(((float)(acc[2] * 2)) / 2048.f) * CONVERT_G_TO_MS2
+        );
 #endif
 
     ei_printf("\r\n");

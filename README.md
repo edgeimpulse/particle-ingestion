@@ -1,12 +1,12 @@
-# Edge Impulse's Particle Photon2 Ingestion Project
+# Edge Impulse's Particle Ingestion Project
 
-For more information see our [Particle Photon 2](https://docs.edgeimpulse.com/docs/development-platforms/officially-supported-mcu-targets/particle-photon-2)
+For more information see our [Particle Photon 2](https://docs.edgeimpulse.com/docs/edge-ai-hardware/mcu/particle-photon-2) or [Particle Boron](https://docs.edgeimpulse.com/docs/edge-ai-hardware/mcu/particle-boron)
 documentation.
 
 ## Hardware
-The ingestion firmware is based on the Particle Photon2 and uses the [Analog Devices ADXL362](https://www.analog.com/media/en/technical-documentation/data-sheets/adxl362.pdf)
+The ingestion firmware is based on the Particle Photon2 and Boron devices. The Photon2 uses the [Analog Devices ADXL362](https://www.analog.com/media/en/technical-documentation/data-sheets/adxl362.pdf) while the Boron uses the [Analog Devices ADXL345](https://www.analog.com/media/en/technical-documentation/data-sheets/adxl345.pdf)
 
-The library used, and included in this project can be found [here](https://github.com/rickkas7/ADXL362DMA) This repository also explains how to connect the ADXL362 to the Photon2
+The library used and included in this project for the Photon 2 can be found [here](https://github.com/rickkas7/ADXL362DMA) This repository also explains how to connect the ADXL362 to the Photon2. For the Boron the library is included in the project properties file dependency list.
 
 ## Setup
 
@@ -21,7 +21,7 @@ For uploading data to studio, the `edge-impulse-data-forwarder` tool is used. Th
 
 1. In Workbench, select **Particle: Import Project** and select the `project.properties` file in the directory that you just downloaded and extracted.
 
-1. Use **Particle: Configure Project for Device** and select **deviceOS@5.4.0 (or a later version)** and choose a target. (e.g. **P2** , this option is also used for the Photon 2).
+1. Use **Particle: Configure Project for Device** and select **deviceOS@5.8.0 (or a later version)** and choose a target. (e.g. **Photon 2/P2** or **Boron**).
 
 1. Compile with  **Particle: Compile application (local)**
 
